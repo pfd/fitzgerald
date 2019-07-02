@@ -13,8 +13,8 @@
 # you will see them accessed via {{ site.title }}, {{ site.github_repo }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Just the Docs
-description: A Jekyll theme for documentation
+title: pfd
+description: A pfd theme for documentation
 baseurl: "/fitzgerald" # the subpath of your site, e.g. /blog
 url: "https://pfd.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
@@ -34,7 +34,8 @@ color_scheme: nil
 
 # Google Analytics Tracking (optional)
 # e.g, UA-1234567-89
-ga_tracking: UA-2709176-10
+ga_tracking: UA-142138857-1
+google-site-verification: 16RKMPRq4l-5153gME9yXAoit3VOUw_OwuM3PEXIiNw
 
 plugins:
   - jekyll-seo-tag
