@@ -69,6 +69,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 2.0.1)
+  jekyll-seo-tag
   just-the-docs!
 
 BUNDLED WITH
