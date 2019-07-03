@@ -7,7 +7,6 @@ nav_order: 2
 # Configuration
 {: .no_toc }
 
-
 Just the Docs has some specific configuration parameters that can be defined in your Jekyll site's _config.yml file.
 {: .fs-6 .fw-300 }
 
@@ -19,6 +18,12 @@ Just the Docs has some specific configuration parameters that can be defined in 
 
 ---
 
+{{ site.data.swagger.info.description }}
+
+{% assign path = "/info" %}
+
+
+{{ site.data.swagger.paths[path].summary }}
 
 View this site's [_config.yml](https://github.com/pmarsceill/just-the-docs/tree/master/_config.yml) file as an example.
 
