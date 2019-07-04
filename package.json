@@ -1,19 +1,23 @@
 {
-  "name": "just-the-docs",
-  "version": "0.2.5",
-  "description": "A modern Jekyll theme for documentation",
-  "repository": "pmarsceill/just-the-docs",
-  "license": "MIT",
-  "bugs": "https://github.com/pmarsceill/just-the-docs/issues",
-  "devDependencies": {
-    "stylelint": "^10.0.1",
-    "stylelint-config-primer": "^7.0.0",
-    "stylelint-selector-no-utility": "^4.0.0"
-  },
-  "dependencies": {
-    "@primer/css": "^12.3.1"
+  "name": "fitzgerald",
+  "version": "1.0.0",
+  "description": "pfd's test jekyll instance",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
   },
   "scripts": {
-    "test": "stylelint '**/*.scss'"
-  }
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfd/fitzgerald.git"
+  },
+  "author": "pfd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pfd/fitzgerald/issues"
+  },
+  "homepage": "https://github.com/pfd/fitzgerald#readme"
 }
