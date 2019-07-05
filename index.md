@@ -66,6 +66,10 @@ If you're hosting your site on GitHub Pages, [set up GitHub Pages and Jekyll loc
 
 ---
 
+## Gulp 
+
+see [this article](https://rhianvanesch.com/articles/2017/01/10/using-gulp-to-manage-a-jekyll-build/) to gulp
+
 ## About the project
 
 Just the Docs is &copy; 2017-2019 by [Patrick Marsceill](http://patrickmarsceill.com).
