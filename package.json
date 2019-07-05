@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/pfd/fitzgerald/issues"
   },
-  "homepage": "https://github.com/pfd/fitzgerald#readme"
+  "homepage": "https://github.com/pfd/fitzgerald#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2"
+  }
 }
