@@ -3,8 +3,9 @@ const child = require('child_process');
 
 const jekyll = process.platform === "win32" ? "jekyll.bat" : "jekyll";
 
-gulp.task('default', () => {
+gulp.task('default', (done) => {
     console.log("Default gulp task is running!");
+    done();
 })
 
 gulp.task('jekyll', (done) => {
