@@ -14,12 +14,11 @@ gulp.task('default', (done) => {
     done();
 })
 
-gulp.task('jekyll', (done) => {
+gulp.task('jekyll', () => {
     return child.spawn(jekyll, ['build',
         '--incremental',
         '--drafts'
     ])
-    child.exit(1);
 })
 
 gulp.task('jekyll-build', function(done) {
