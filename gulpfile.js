@@ -27,5 +27,10 @@ gulp.task('jekyll-build', function(done) {
     .on('close', done);
 });
 
-
+// test task. copies a file anc puts it in a new directory
+gulp.task('copyFile', function(done) {
+  // copy any html files in source/ to public/
+  gulp.src('_data/swagger.yml').pipe(gulp.dest('public'));
+  done();
+});
 
