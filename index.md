@@ -16,6 +16,24 @@ Just the Docs gives your documentation a jumpstart with a responsive Jekyll them
 
 ---
 
+## CSV Test
+
+```csv
+ua_address,ua_commercial_opted_in,name,address.city,address.state,items.[0].name,items.[1].name  
+someone@sample.com,2018-04-01T18:45:30,Joe Someone,Portland,OR,Rubber Gloves,Bleach Alternative  
+else@sample.com,2018-04-21T16:13:01,Sir Else,Seattle,WA,Flashlight,Shovel
+```
+
+{% highlight python %}
+x = ('a', 1, False)
+{% endhighlight %}
+
+{% highlight brainfuck %}
+ua_address,ua_commercial_opted_in,name,address.city,address.state,items.[0].name,items.[1].name,derp,herp,lerp
+someone@sample.com,2018-04-01T18:45:30,Joe Someone,Portland,OR,Rubber Gloves,Bleach Alternative  
+else@sample.com,2018-04-21T16:13:01,Sir Else,Seattle,WA,Flashlight,Shovel
+{% endhighlight %}
+
 ## Getting started
 
 ### Dependencies
