@@ -10,7 +10,8 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  x-logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSldCXjS4UNRfALjLFwnMXkpafw7ytvXaJp8juZmuR2HU3KagGr&s"
+  x-logo: 
+    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSldCXjS4UNRfALjLFwnMXkpafw7ytvXaJp8juZmuR2HU3KagGr&s"
 paths:
   /info:
     get:
