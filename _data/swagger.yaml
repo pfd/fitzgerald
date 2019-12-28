@@ -11,7 +11,7 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo: 
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSldCXjS4UNRfALjLFwnMXkpafw7ytvXaJp8juZmuR2HU3KagGr&s"
+    url: "https://23s6x22phk5q33910hihb4ku-wpengine.netdna-ssl.com/wp-content/uploads/2019/11/SheerID-Logo-300x138.png"
 paths:
   /info:
     get:
