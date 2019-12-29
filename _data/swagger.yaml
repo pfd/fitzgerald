@@ -3,7 +3,7 @@ servers:
   - url: /rest/v2
 info:
   description: |
-
+  
     ### Basics
 
     The SheerID API is organized around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer).
@@ -12,7 +12,7 @@ info:
 
     The base URL for the SheerID REST API is `https://services.sheerid.com/rest/v2/`.
 
-    ### Authentication
+    ### derp
 
     Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
     [MySheerID](https://my.sheerid.com) under *Settings* »» *Access Tokens*. You will also find your Account ID, which you will need in certain conversion tracking operations.
