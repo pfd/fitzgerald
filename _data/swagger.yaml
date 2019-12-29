@@ -4,15 +4,13 @@ servers:
 info:
   description: |
 
-    ## Basics
+    ### Basics
 
     The SheerID API is organized around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer).
 
     ### Base URL
 
     The base URL for the SheerID REST API is `https://services.sheerid.com/rest/v2/`.
-
-    The current version is <span id="api-version">2.0.0</span>.
 
     ### Authentication
 
@@ -25,7 +23,7 @@ info:
     Content-Type: application/json
     Authorization: Bearer {YOUR_ACCESS_TOKEN}
     ```
-    
+
   version: 2.0.0
   title: SheerID API
   contact:
@@ -33,7 +31,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  x-logo: 
+  x-logo:
     url: 'https://23s6x22phk5q33910hihb4ku-wpengine.netdna-ssl.com/wp-content/uploads/2019/11/SheerID_118x27.png'
     href: '/'
     backgroundColor: '#26c0db'
