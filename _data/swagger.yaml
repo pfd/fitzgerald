@@ -12,12 +12,6 @@ info:
 
     The base URL for the SheerID REST API is `https://services.sheerid.com/rest/v2/`.
 
-    ### derp
-
-    Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
-    [MySheerID](https://my.sheerid.com) under *Settings* »» *Access Tokens*. You will also find your Account ID, which you will need in certain conversion tracking operations.
-
-
     ```http
     GET /rest/v2/info HTTP/1.1
     Content-Type: application/json
@@ -2444,7 +2438,11 @@ components:
   securitySchemes:
     apiToken:
       type: apiKey
-      description: Hellow orld
+      description: |
+
+        Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
+        [MySheerID](https://my.sheerid.com) under *Settings* »» *Access Tokens*. You will also find your Account ID, which you will need in certain conversion tracking operations.
+
       name: Authorization
       in: header
   schemas:
