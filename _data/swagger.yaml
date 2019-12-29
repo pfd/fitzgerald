@@ -2443,6 +2443,7 @@ paths:
 components:
   securitySchemes:
     apiToken:
+      description: Hellow orld
       type: apiKey
       name: Authorization
       in: header
