@@ -2,26 +2,6 @@ openapi: 3.0.0
 servers:
   - url: /rest/v2
 info:
-  description: |
-  
-    ### Basics
-
-    The SheerID API is organized around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer).
-
-    ### Base URL
-
-    ### Cool image
-
-    ![is this alt text?](/assets/images/access-tokens.png)
-
-    The base URL for the SheerID REST API is `https://services.sheerid.com/rest/v2/`.
-
-    ```http
-    GET /rest/v2/info HTTP/1.1
-    Content-Type: application/json
-    Authorization: Bearer {YOUR_ACCESS_TOKEN}
-    ```
-
   version: 2.0.0
   title: SheerID API
   contact:
@@ -34,6 +14,27 @@ info:
     href: '/'
     backgroundColor: '#26c0db'
     altText: 'SheerID REST API Reference'
+  description: |
+    ## Introduction
+
+    The SheerID API is organized around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer).
+
+    ### Base URL
+
+    The base URL for the SheerID REST API is `https://services.sheerid.com/rest/v2/`.
+    
+    ### Authentication
+
+    Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
+    [MySheerID](https://my.sheerid.com){:target="_blank"} under *Settings* »» *Access Tokens*. There you will also find your Account ID, which you will need in certain conversion tracking operations.
+
+    ![SheerID Access Tokens](/assets/images/access-tokens.png)
+
+    ```http
+    GET /rest/v2/info HTTP/1.1
+    Content-Type: application/json
+    Authorization: Bearer {YOUR_ACCESS_TOKEN}
+    ```
 paths:
   /info:
     get:
@@ -2442,11 +2443,6 @@ components:
   securitySchemes:
     apiToken:
       type: apiKey
-      description: |
-
-        Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
-        [MySheerID](https://my.sheerid.com) under *Settings* »» *Access Tokens*. You will also find your Account ID, which you will need in certain conversion tracking operations.
-
       name: Authorization
       in: header
   schemas:
