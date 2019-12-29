@@ -26,7 +26,7 @@ info:
     ### Authentication
 
     Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
-    [MySheerID](https://my.sheerid.com){:target="_blank"} under *Settings* »» *Access Tokens*. There you will also find your Account ID, which you will need in certain conversion tracking operations.
+    [MySheerID](https://my.sheerid.com) under *Settings* »» *Access Tokens*. There you will also find your Account ID, which you will need in certain conversion tracking operations.
 
     ![SheerID Access Tokens](/assets/images/access-tokens.png)
 
