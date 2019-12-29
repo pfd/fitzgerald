@@ -12,6 +12,8 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo: 
     url: "https://23s6x22phk5q33910hihb4ku-wpengine.netdna-ssl.com/wp-content/uploads/2019/11/SheerID-Logo-300x138.png"
+    href: 'https://google.com'
+    backgroundColor: 'blue'
 paths:
   /info:
     get:
