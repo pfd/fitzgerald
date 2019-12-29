@@ -11,9 +11,9 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo: 
-    url: "https://23s6x22phk5q33910hihb4ku-wpengine.netdna-ssl.com/wp-content/uploads/2019/11/SheerID-Logo-300x138.png"
+    url: 'https://23s6x22phk5q33910hihb4ku-wpengine.netdna-ssl.com/wp-content/uploads/2019/11/SheerID_118x27.png'
     href: 'https://developer.sheerid.com/'
-    backgroundColor: '#007bff'
+    backgroundColor: '#26c0db'
     altText: 'SheerID REST API Reference'
 paths:
   /info:
