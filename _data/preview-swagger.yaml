@@ -1,0 +1,3977 @@
+openapi: 3.0.0
+servers:
+  - url: /rest/v2
+info:
+  x-logo:
+    url: 'https://23s6x22phk5q33910hihb4ku-wpengine.netdna-ssl.com/wp-content/uploads/2019/11/SheerID_118x27.png'
+    href: '/'
+    backgroundColor: '#26c0db'
+    altText: 'SheerID REST API Reference'
+  description: |
+    ## Introduction
+
+    The SheerID API is organized around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer).
+
+    ### Base URL
+
+    The base URL for the SheerID REST API is `https://services.sheerid.com/rest/v2/`.
+    
+    ### Authentication
+
+    Certain endpoints require a Bearer Token for authentication. Retrieve your API access token from
+    [MySheerID](https://my.sheerid.com) under *Settings* »» *Access Tokens*. There you will also find your Account ID, which you will need in certain conversion tracking operations.
+
+    ![SheerID Access Tokens](/assets/images/access-tokens.png)
+
+    ```http
+    GET /rest/v2/info HTTP/1.1
+    Content-Type: application/json
+    Authorization: Bearer {YOUR_ACCESS_TOKEN}
+    ```
+  description: REST API to support performing verifications
+  version: 2.0.0
+  title: SheerID API
+  contact:
+    email: helpdesk@sheerid.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  /info:
+    get:
+      tags:
+        - info
+      summary: Retrieve build information
+      operationId: getBuildInformation
+      responses:
+        '200':
+          description: 'Successful response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildInformationResponseMessage'
+  /verification:
+    post:
+      tags:
+        - verification
+      summary: Start the verification flow for a given program
+      description: Start the verification flow for a given program
+      operationId: newVerification
+      responses:
+        '200':
+          description: The initial information required to render the verification form
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewVerificationResponse'
+              examples:
+                collectStudentInfo:
+                  $ref: '#/components/examples/collectStudentInfo'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                programNotFound:
+                  $ref: '#/components/examples/programNotFoundError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewVerificationRequest'
+            example:
+              programId: '222222222222222222222222'
+        description: The request to retrieve a verification configuration for a given program
+        required: true
+  '/verification/{verificationId}/step/collectStudentPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a student verification
+      description: Submit data for a student verification
+      operationId: submitStudentVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                studentSuccess:
+                  $ref: '#/components/examples/studentSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectStudentInfoInvalid:
+                  $ref: '#/components/examples/collectStudentInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                studentVerificationLimitError:
+                  $ref: '#/components/examples/studentVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some University
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The student and university data collected from the user to be
+          verified
+        required: true
+  '/verification/program/{programId}/step/collectStudentPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a student verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectStudentPersonalInfo`
+      operationId: submitStudentVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                studentSuccess:
+                  $ref: '#/components/examples/studentSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectStudentInfoInvalid:
+                  $ref: '#/components/examples/collectStudentInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                studentVerificationLimitError:
+                  $ref: '#/components/examples/studentVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some University
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The student and university data collected from the user to be
+          verified
+        required: true
+  '/verification/{verificationId}/step/collectMilitaryStatus':
+    post:
+      tags:
+        - verification
+      summary: Submit military status to determine which kind of military verification to perform
+      description: Submit military status to determine which kind of military verification to perform
+      operationId: submitMilitaryStatus
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The next step to perform in the verification flow
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectActiveMilitaryInfo:
+                  $ref: '#/components/examples/collectActiveMilitaryInfo'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectMilitaryStatusInvalid:
+                  $ref: '#/components/examples/collectMilitaryStatusInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MilitaryStatusRequest'
+        description: The status of the military member being verified
+        required: true
+  '/verification/{verificationId}/step/collectActiveMilitaryPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for an active military verification
+      description: Submit data for an active military verification
+      operationId: submitActiveMilitaryVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                activeMilitarySuccess:
+                  $ref: '#/components/examples/activeMilitarySuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectActiveMilitaryInfoInvalid:
+                  $ref: '#/components/examples/collectActiveMilitaryInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                activeMilitaryVerificationLimitError:
+                  $ref: '#/components/examples/activeMilitaryVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActiveMilitary'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some Military Organization
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The active military and branch of service data collected from the user to be
+          verified
+        required: true
+  '/verification/program/{programId}/step/collectActiveMilitaryPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for an active military verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectActiveMilitaryPersonalInfo`
+      operationId: submitActiveMilitaryVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                activeMilitarySuccess:
+                  $ref: '#/components/examples/activeMilitarySuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectActiveMilitaryInfo:
+                  $ref: '#/components/examples/collectActiveMilitaryInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                activeMilitaryVerificationLimitError:
+                  $ref: '#/components/examples/activeMilitaryVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActiveMilitary'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some Military Organization
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The active military and branch of service data collected from the user to be
+          verified
+        required: true
+  '/verification/{verificationId}/step/collectInactiveMilitaryPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for an inactive military verification
+      description: Submit data for an inactive military verification
+      operationId: submitInactiveMilitaryVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                inactiveMilitarySuccess:
+                  $ref: '#/components/examples/inactiveMilitarySuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectInactiveMilitaryInfoInvalid:
+                  $ref: '#/components/examples/collectInactiveMilitaryInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                inactiveMilitaryVerificationLimitError:
+                  $ref: '#/components/examples/inactiveMilitaryVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InactiveMilitary'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              dischargeDate: '2000-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some Military Organization
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The inactive duty and branch of service data collected from the user to be
+          verified
+        required: true
+  '/verification/program/{programId}/step/collectInactiveMilitaryPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for an inactive military verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectInactiveMilitaryPersonalInfo`
+      operationId: submitInactiveMilitaryVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                inactiveMilitarySuccess:
+                  $ref: '#/components/examples/inactiveMilitarySuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectInactiveMilitaryInfoInvalid:
+                  $ref: '#/components/examples/collectInactiveMilitaryInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                inactiveMilitaryVerificationLimitError:
+                  $ref: '#/components/examples/inactiveMilitaryVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InactiveMilitary'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              dischargeDate: '2000-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some Military Organization
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The inactive duty and branch of service data collected from the user to be
+          verified
+        required: true
+  '/verification/{verificationId}/step/collectTeacherPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a teacher verification
+      description: Submit data for a teacher verification
+      operationId: submitTeacherVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                teacherSuccess:
+                  $ref: '#/components/examples/teacherSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectTeacherInfoInvalid:
+                  $ref: '#/components/examples/collectTeacherInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                teacherVerificationLimitError:
+                  $ref: '#/components/examples/teacherVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teacher'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some School
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The teacher and school data collected from the user to be
+          verified
+        required: true
+  '/verification/program/{programId}/step/collectTeacherPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a teacher verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectTeacherPersonalInfo`
+      operationId: submitTeacherVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                teacherSuccess:
+                  $ref: '#/components/examples/teacherSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectTeacherInfoInvalid:
+                  $ref: '#/components/examples/collectTeacherInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                teacherVerificationLimitError:
+                  $ref: '#/components/examples/teacherVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teacher'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some School
+              metadata:
+                my: stuff
+                goes: here
+        description: >-
+          The teacher and school data collected from the user to be
+          verified
+        required: true
+  '/verification/{verificationId}/step/collectSeniorPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a senior verification
+      description: Submit data for a senior verification
+      operationId: submitSeniorVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                seniorSuccess:
+                  $ref: '#/components/examples/seniorSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectSeniorInfoInvalid:
+                  $ref: '#/components/examples/collectSeniorInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                seniorVerificationLimitError:
+                  $ref: '#/components/examples/seniorVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Senior'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              postalCode: '12345'
+              email: joe.verify@sheerid.com
+              metadata:
+                my: stuff
+                goes: here
+        description: The senior data collected from the user to be verified
+        required: true
+  '/verification/program/{programId}/step/collectSeniorPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a senior verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectSeniorPersonalInfo`
+      operationId: submitSeniorVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                seniorSuccess:
+                  $ref: '#/components/examples/seniorSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectSeniorInfoInvalid:
+                  $ref: '#/components/examples/collectSeniorInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                seniorVerificationLimitError:
+                  $ref: '#/components/examples/seniorVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Senior'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              postalCode: 12345
+              email: joe.verify@sheerid.com
+              metadata:
+                my: stuff
+                goes: here
+        description: The senior data collected from the user to be verified
+        required: true
+  '/verification/{verificationId}/step/collectFirstResponderPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a first responder verification
+      description: Submit data for a first responder verification
+      operationId: submitFirstResponderVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                firstResponderSuccess:
+                  $ref: '#/components/examples/firstResponderSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectFirstResponderInfoInvalid:
+                  $ref: '#/components/examples/collectFirstResponderInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                firstResponderVerificationLimitError:
+                  $ref: '#/components/examples/firstResponderVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirstResponder'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              status: 'POLICE'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some School
+              metadata:
+                my: stuff
+                goes: here
+        description: The first responder data collected from the user to be verified
+        required: true
+  '/verification/program/{programId}/step/collectFirstResponderPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a first responder verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectFirstResponderPersonalInfo`
+      operationId: submitFirstResponderVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                firstResponderSuccess:
+                  $ref: '#/components/examples/firstResponderSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectFirstResponderInfoInvalid:
+                  $ref: '#/components/examples/collectFirstResponderInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                firstResponderVerificationLimitError:
+                  $ref: '#/components/examples/firstResponderVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirstResponder'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              status: 'POLICE'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some School
+              metadata:
+                my: stuff
+                goes: here
+        description: The first responder data collected from the user to be verified
+        required: true
+  '/verification/{verificationId}/step/collectMedicalProfessionalPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a medical professional verification
+      description: Submit data for a medical professional verification
+      operationId: submitMedicalProfessionalVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                medicalProfessionalSuccess:
+                  $ref: '#/components/examples/medicalProfessionalSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectMedicalProfessionalInfoInvalid:
+                  $ref: '#/components/examples/collectMedicalProfessionalInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                medicalProfessionalVerificationLimitError:
+                  $ref: '#/components/examples/medicalProfessionalVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalProfessional'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              status: 'NURSE'
+              email: joe.verify@sheerid.com
+              postalCode: '12345'
+              organization:
+                id: 1234
+                name: Some Medical Organization
+              metadata:
+                my: stuff
+                goes: here
+        description: The medical professional and organization data collected from the user to be verified
+        required: true
+  '/verification/program/{programId}/step/collectMedicalProfessionalPersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a medical professional verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectMedicalProfessionalPersonalInfo`
+      operationId: submitMedicalProfessionalVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                medicalProfessionalSuccess:
+                  $ref: '#/components/examples/medicalProfessionalSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectMedicalProfessionalInfoInvalid:
+                  $ref: '#/components/examples/collectMedicalProfessionalInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                medicalProfessionalVerificationLimitError:
+                  $ref: '#/components/examples/medicalProfessionalVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalProfessional'
+            example:
+              firstName: Joe
+              lastName: Verify
+              birthDate: '1991-01-01'
+              status: 'NURSE'
+              email: joe.verify@sheerid.com
+              organization:
+                id: 1234
+                name: Some Medical Organization
+              metadata:
+                my: stuff
+                goes: here
+        description: The medical professional data collected from the user to be verified
+        required: true
+  '/verification/{verificationId}/step/collectEmployeePersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for an employee verification
+      description: Submit data for an employee verification
+      operationId: submitEmployeeVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                employeeSuccess:
+                  $ref: '#/components/examples/employeeSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectEmployeeInfoInvalid:
+                  $ref: '#/components/examples/collectEmployeeInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                employeeVerificationLimitError:
+                  $ref: '#/components/examples/employeeVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+            example:
+              firstName: Joe
+              lastName: Verify
+              email: joe.verify@sheerid.com
+              address1: '123 Main St'
+              city: Anytown
+              state: OR
+              postalCode: '12345'
+              status: 'EMPLOYEE'
+              organization:
+                id: 1234
+                name: Some Company
+              metadata:
+                my: stuff
+                goes: here
+        description: The employee and company data collected from the user to be verified
+        required: true
+  '/verification/program/{programId}/step/collectEmployeePersonalInfo':
+    post:
+      tags:
+        - verification
+      summary: Submit data for an employee verification against a given program
+      description: >-
+        Using this endpoint starts a verification and submits personal info in one request, and is the equivalent to
+        POSTing to `/verification` and then `/verification/{verificationId}/step/collectEmployeePersonalInfo`
+      operationId: submitEmployeeVerificationWithProgramId
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program to use for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                employeeSuccess:
+                  $ref: '#/components/examples/employeeSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectEmployeeInfoInvalid:
+                  $ref: '#/components/examples/collectEmployeeInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                employeeVerificationLimitError:
+                  $ref: '#/components/examples/employeeVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+            example:
+              firstName: Joe
+              lastName: Verify
+              email: joe.verify@sheerid.com
+              address1: '123 Main St'
+              city: Anytown
+              state: OR
+              postalCode: '12345'
+              status: 'EMPLOYEE'
+              organization:
+                id: 1234
+                name: Some Company
+              metadata:
+                my: stuff
+                goes: here
+        description: The employee and company data collected from the user to be verified
+        required: true
+  '/verification/{verificationId}/step/sso':
+    get:
+      tags:
+        - verification
+      summary: Start the SSO process for a given verification. This endpoint will redirect the user to the appropriate login page.
+      description: Start the SSO process for a given verification. This endpoint will redirect the user to the appropriate login page.
+      operationId: beginSso
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '307':
+          description: Redirect to the appropriate login page.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                invalidSsoError:
+                  $ref: '#/components/examples/invalidSsoError'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+    delete:
+      tags:
+        - verification
+      summary: Cancel an ongoing SSO verification (will move the verification to the docUpload step)
+      description: Cancel an ongoing SSO verification (will move the verification to the docUpload step)
+      operationId: cancelSso
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The next step in the verification process
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                studentSuccess:
+                  $ref: '#/components/examples/studentSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                invalidSsoError:
+                  $ref: '#/components/examples/invalidSsoError'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+  '/verification/{verificationId}/step/docUpload/{docUploadToken}':
+    post:
+      tags:
+        - verification
+      summary: Submit files for document review
+      description: Submit files for document review
+      operationId: submitDocumentReviewFiles
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: docUploadToken
+          description: Token to authorize a document to be uploaded for a given verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the document upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                pending:
+                  $ref: '#/components/examples/pending'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                maxFilesExceededError:
+                  $ref: '#/components/examples/maxFilesExceededError'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more document uploads due to the program's upload limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                docReviewLimitExceeded:
+                  $ref: '#/components/examples/docReviewLimitExceededError'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadRequest'
+        description: The file(s) to be uploaded for review
+        required: true
+  /verification/marketplace:
+    post:
+      tags:
+        - verification
+      summary: Create a verification that will use the Marketplace verification system
+      description: Create a verification that will use the Marketplace verification system
+      operationId: newMarketplaceVerification
+      responses:
+        '200':
+          description: A response including the unique verification token that can be used to verify the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewMarketplaceVerificationResponse'
+              examples:
+                collectMarketplaceToken:
+                  $ref: '#/components/examples/collectMarketplaceToken'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                invalidProgramError:
+                  $ref: '#/components/examples/invalidProgramError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidTokenError:
+                  $ref: '#/components/examples/invalidTokenError'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                programNotFound:
+                  $ref: '#/components/examples/programNotFoundError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMarketplaceVerificationRequest'
+            example:
+              programId: '222222222222222222222222'
+              trackingId: '333333333333333333333333'
+              subject:
+                email: 'user@place.com'
+        description: The request to retrieve a verification token to verify with the provided program
+        required: true
+      security:
+        - apiToken: []
+  '/verification/{verificationId}/step/collectMarketplaceToken':
+    post:
+      tags:
+        - verification
+      summary: Submit data for a marketplace verification
+      description: Submit data for a marketplace verification
+      operationId: submitMarketplaceVerification
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result of the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                marketplaceSuccess:
+                  $ref: '#/components/examples/marketplaceSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectEmployeeInfoInvalid:
+                  $ref: '#/components/examples/collectEmployeeInfoInvalid'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more verifications due to the program's person limiting policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                marketplaceVerificationLimitError:
+                  $ref: '#/components/examples/marketplaceVerificationLimitError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationToken'
+            example:
+              verificationToken: 'AbcdEfg1234!@#$AbcdEfg1234!@#$12'
+        description: The verification token to submit a marketplace verification
+        required: true
+  '/verification/{verificationId}':
+    get:
+      tags:
+        - verification
+      summary: Get current state of a verification including the current step and submission URL if available
+      description: Get current state of a verification including the current step and submission URL if available
+      operationId: getVerificationStatus
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The current status for the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+              examples:
+                collectStudentInfo:
+                  $ref: '#/components/examples/collectStudentInfo'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+        '429':
+          description: User is not permitted to perform any more document uploads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                docReviewLimitExceeded:
+                  $ref: '#/components/examples/docReviewLimitExceededError'
+  '/verification/{verificationId}/details':
+    get:
+      tags:
+        - verification
+      summary: Get detailed information about a verification. Requires an API token.
+      description: Get detailed information about a verification. Requires an API token.
+      operationId: getVerificationDetails
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed information about the verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationDetails'
+              examples:
+                verificationDetails:
+                  $ref: '#/components/examples/verificationDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Provided API token is empty or invalid
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: No verification found with id '111111111111111111111111'
+      security:
+        - apiToken: []
+  '/verification/{verificationId}/metadata':
+    get:
+      tags:
+        - verification
+      summary: Get the metadata of a verification. Requires an API token.
+      description: Get the metadata of a verification. Requires an API token.
+      operationId: getVerificationMetadata
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The metadata JSON object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalInfoMetadata'
+              example:
+                my: stuff
+                goes: here
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Provided API token is empty or invalid
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: No verification found with id '111111111111111111111111'
+      security:
+        - apiToken: []
+    put:
+      tags:
+        - verification
+      summary: Replace the metadata of an ongoing verification. Requires an API token.
+      description: Replace the metadata of an ongoing verification. Requires an API token.
+      operationId: updateVerificationMetadata
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the ongoing verification
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalInfoMetadata'
+            example:
+              key: value
+              anotherKey: "another value"
+        required: true
+      responses:
+        '200':
+          description: The updated metadata JSON object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalInfoMetadata'
+              example:
+                key: value
+                anotherKey: "another value"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Provided API token is empty or invalid
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: No verification found with id '111111111111111111111111'
+      security:
+        - apiToken: []
+  '/verification/{verificationId}/refireWebhooks':
+    post:
+      tags:
+        - verification
+      summary: Refire the most recent webhook notifications for the verification request
+      description: Refire the most recent webhook notifications for the verification request
+      operationId: refireWebhooks
+      parameters:
+        - in: path
+          name: verificationId
+          description: Unique identifier for the verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Webhooks were successfully refired
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                verificationNotFound:
+                  $ref: '#/components/examples/verificationNotFoundError'
+      security:
+        - apiToken: []
+  '/verification/reverify':
+    post:
+      tags:
+        - verification
+      summary: Re-verify a set of verification requests
+      description: Re-verify a set of verifications as a bulk processing job
+      operationId: reverifyUsingVerificationIds
+      responses:
+        '202':
+          description: The re-verification task has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReverificationTaskResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Missing program ID or verification IDs
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: User is not authorized to make this request
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Program with ID '222222222222222222222222' not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReverificationTaskRequest'
+            example:
+              programId: '222222222222222222222222'
+              verificationIds: ['verificationId1', 'verificationId2']
+        description: The re-verification task request object which includes a program ID and a list of valid verification ID's
+        required: true
+      security:
+        - apiToken: []
+  '/verification/reverify/{batchId}':
+    get:
+      tags:
+        - verification
+      summary: Check the status of a re-verification task
+      description: Returns an object with details about the currently running re-verification task identified by the batchId
+      operationId: getReverificationTaskStatusReport
+      parameters:
+        - in: path
+          name: batchId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The status of the batch re-verification job being processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReverificationTaskStatusReport'
+        '404':
+          description: Re-verification task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                systemErrorMessage: Re-verification task with batch ID '222222222222222222222222' not found
+      security:
+        - apiToken: []
+  '/program/{programId}/theme':
+    get:
+      tags:
+        - program
+      summary: Get the theme data (messages and CSS) for a program
+      description: Get the theme data (messages and CSS) for a program
+      operationId: getProgramTheme
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: locale
+          description: Optionally override locale to use for translations (defaults to using locale with HTTP request)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The theme data for a program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramTheme'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                systemErrorMessage: Program with ID '222222222222222222222222' not found
+  '/program/{programId}/organization':
+    get:
+      tags:
+        - program
+      summary: Use orgSearchUrl in ProgramVerificationConfig
+      description: This endpoint has been deprecated, please use `orgSearchUrl` in ProgramVerificationConfig instead.
+      operationId: getOrganizations
+      parameters:
+        - in: query
+          name: name
+          description: All or part of the organization name to use for search
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: country
+          description: An optional country to use for filtering which orgs to show
+          required: false
+          schema:
+            type: string
+        - in: path
+          name: programId
+          description: The unique identifier for the program being used for the verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The list of Organizations matching the search
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organization'
+              example:
+                id: 1234
+                name: Organization Name
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Program with ID '222222222222222222222222' not found
+  '/program/{programId}/verificationLimit':
+    post:
+      tags:
+        - program
+      summary: Create a verification limit for a given program
+      description: Create a verification limit for a given program
+      operationId: createVerificationLimit
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The current available data for a program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Program with ID '222222222222222222222222' not found
+        '409':
+          description: Verification limit already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationLimitRequest'
+        description: The create verification limit request
+        required: true
+      security:
+        - apiToken: []
+    delete:
+      tags:
+        - program
+      summary: Delete verification limit for a given program
+      description: Delete verification limit for a given program
+      operationId: deleteVerificationLimit
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The current available data for a program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+      security:
+        - apiToken: []
+  '/program/{programId}/webhook':
+    post:
+      tags:
+        - program
+      summary: Create a webhook for any verifications done using the given program
+      description: Create a webhook for any verifications done using the given program
+      operationId: createWebhook
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The current available data for a program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '409':
+          description: Webhook already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+        description: The create webhook request
+        required: true
+      security:
+        - apiToken: []
+    delete:
+      tags:
+        - program
+      summary: Delete the webhook for any verifications done using the given program
+      description: Delete the webhook for any verifications done using the given program
+      operationId: deleteWebhook
+      parameters:
+        - in: path
+          name: programId
+          description: Unique identifier for the program
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The current available data for a program
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Program not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+      security:
+        - apiToken: []
+  '/report/verification':
+    post:
+      operationId: generateVerificationReport
+      tags:
+        - report
+      summary: Generate a verification report
+      description: Generate a verification report which can be downloaded later
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationReportRequest'
+            example:
+              startDate: '2000-12-25'
+              endDate: '2000-12-31'
+              format: CSV
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportStatusResponse'
+              examples:
+                reportStatusResponsePending:
+                  $ref: '#/components/examples/reportStatusResponsePending'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Provided API token is empty or invalid
+      security:
+        - apiToken: []
+  '/report/reverify/{batchId}':
+    post:
+      operationId: generateReverificationReport
+      tags:
+        - report
+      summary: Generate a verification report for a re-verification task
+      description: Generate a verification report for a re-verification task which can be downloaded later
+      parameters:
+        - in: path
+          name: batchId
+          description: The ID of the re-verification task
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportStatusResponse'
+              example:
+                reportStatusResponsePending:
+                  $ref: '#/components/examples/reportStatusResponsePending'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+              example:
+                systemErrorMessage: Provided API token is empty or invalid
+      security:
+        - apiToken: []
+  '/report/{reportId}/status':
+    get:
+      operationId: getReportStatus
+      tags:
+        - report
+      summary: Retrieve report generation status by report ID
+      description: Retrieve report generation status by report ID
+      parameters:
+        - in: path
+          name: reportId
+          description: Unique identifier of Report to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Information indicating whether the report is ready for download yet, or not.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportStatusResponse'
+              examples:
+                reportStatusResponseComplete:
+                  $ref: '#/components/examples/reportStatusResponseComplete'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+          description: No report found having the supplied ID
+      security:
+        - apiToken: []
+  '/report/{reportId}':
+    get:
+      operationId: getReportData
+      tags:
+        - report
+      summary: Retrieve data for a previously-generated report
+      description: Retrieve data for a previously-generated report
+      parameters:
+        - in: path
+          name: reportId
+          description: Unique identifier of Report to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful retrieval of report data
+        '202':
+          description: 'Report is still being generated and is not ready yet'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+          description: Unauthorized
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+          description: No report found having the supplied ID
+        '410':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+          description: The requested report has been deleted/purged
+      security:
+        - apiToken: []
+  '/conversion/verification/{verificationId}':
+    post:
+      tags:
+        - conversion
+      summary: Store conversion information
+      description: Store conversion information
+      operationId: storeVerificationConversion
+      parameters:
+        - in: path
+          name: verificationId
+          description: The ID of the verification to correlate the conversion info to
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Verification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversionRequest'
+        description: >-
+          The conversion information
+        required: true
+  '/conversion/account/{accountId}/trackingId/{trackingId}':
+    post:
+      tags:
+        - conversion
+      summary: Store conversion information
+      description: Store conversion information based on a tracking ID provided with the NewVerificationRequest when creating a verification
+      operationId: storeVerificationConversionByTrackingId
+      parameters:
+        - in: path
+          name: accountId
+          description: Unique identifier for the account that made the conversion
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: trackingId
+          description: The "Tracking ID" supplied when the verification was created
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+        '404':
+          description: Account or trackingId not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemErrorMessage'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversionRequest'
+        description: >-
+          The conversion information
+        required: true
+components:
+  securitySchemes:
+    apiToken:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    ActiveMilitary:
+      type: object
+      description: An active duty member to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        birthDate:
+          $ref: '#/components/schemas/ValidBirthDate'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - birthDate
+        - organization
+    BuildInformationResponseMessage:
+      type: object
+      description: The current version number and build time for the SheerID server application
+      properties:
+        sheeridVersion:
+          type: string
+          description: The version of SheerID deployed on the server
+        sheeridGitCommit:
+          type: string
+          description: The Git SHA1 hash for the last commit in this build
+        puppetGitCommit:
+          type: string
+          description: The Git SHA1 hash for the last commit in the puppet configuration realm at deployment time
+        buildTimestamp:
+          type: string
+          description: The timestamp of the build which produced the version of SheerID deployed on the server
+    ConversionRequest:
+      type: object
+      description: Information about a conversion
+      properties:
+        amount:
+          type: number
+          description: The amount of the conversion
+          format: double
+          minimum: 0
+          default: 1.0
+        currency:
+          type: string
+          description: >-
+            The ISO-4217 3-letter Alphabetic Currency Code (Default: "USD")
+          default: 'USD'
+        tags:
+          type: array
+          items:
+            type: string
+            description: An array of any arbitrary tags to associate with the conversion
+    ConversionResponse:
+      type: object
+      description: The result of storing the conversion.
+      properties:
+        id:
+          type: string
+          description: The ID of the stored conversion.
+    CustomMetadata:
+      type: object
+      description: The custom metadata configuration being used for a verification
+      properties:
+        enabled:
+          type: boolean
+          description: Whether or not collecting metadata keys is enabled
+        keys:
+          type: array
+          items:
+            type: string
+            description: The list of keys to be collected, if metadata collection is enabled
+      required:
+        - enabled
+        - keys
+    DocumentReviewResponse:
+      type: object
+      description: Instant verification was not successful, so a document must be uploaded for review
+      properties:
+        verificationId:
+          type: string
+          description: >-
+            The unique ID for the
+            [VerificationRequest](#!/components/schemas/VerificationRequest) associated
+            with this response
+        currentStep:
+          $ref: '#/components/schemas/VerificationStep'
+        submissionUrl:
+          type: string
+          description: The URL to use for uploading documents
+        errorIds:
+          type: array
+          description: The list of errors that occurred, if any
+          items:
+            $ref: '#/components/schemas/ErrorId'
+        rejectionReasons:
+          type: array
+          description: The keys to be used to fetch any reasons the previous documents associated with the verificaiton were rejected
+          items:
+            $ref: '#/components/schemas/RejectionReason'
+        segment:
+          $ref: '#/components/schemas/Segment'
+        subsegment:
+          $ref: '#/components/schemas/SubSegment'
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+        - segment
+    DocumentUploadRequest:
+      type: object
+      description: Request to upload files for document review
+      properties:
+        file:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - file
+    DocUploadMessages:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title for the document upload step
+        subtitle:
+          type: string
+          description: The subtitle for the document upload step
+      required:
+        - title
+        - subtitle
+        - acceptedTypes
+        - submitButtonLabel
+        - footer
+    Employee:
+      type: object
+      description: An employee to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        address1:
+          description: The street address for the person being verified
+          type: string
+        city:
+          description: The city for the person being verified
+          type: string
+        state:
+          description: The 2 digit state code for the person being verified
+          type: string
+        postalCode:
+          description: The postal code for the person being verified
+          type: string
+        status:
+          $ref: '#/components/schemas/EmploymentStatus'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - address1
+        - city
+        - state
+        - postalCode
+        - organization
+    EmploymentStatus:
+      type: string
+      enum:
+        - EMPLOYEE
+    ErrorId:
+      type: string
+      description: The unique identifier for the error messaging to show to the end user.
+      enum:
+        - internalServerError
+        - noProgram
+        - invalidProgram
+        - noVerification
+        - noOrganization
+        - invalidStep
+        - invalidOrganizationId
+        - invalidFirstName
+        - invalidLastName
+        - invalidEmail
+        - invalidPhoneNumber
+        - invalidBirthDate
+        - invalidMedicalProfessionalStatus
+        - invalidRequest
+        - underagePerson
+        - outsideAgePerson
+        - futureBirthDate
+        - noValidFiles
+        - verificationLimitExceeded
+        - apiRateLimitExceeded
+        - docReviewLimitExceeded
+        - maxMetadataValuesExceeded
+        - maxMetadataLengthExceeded
+    ErrorResponse:
+      type: object
+      description: A non-recoverable error occurred. Check the `systemErrorMessage` property for debugging info.
+      properties:
+        verificationId:
+          type: string
+          description: >-
+            The unique ID for the
+            [VerificationRequest](#!/components/schemas/VerificationRequest) associated
+            with this response
+        errorIds:
+          type: array
+          description: The list of errors that occurred
+          items:
+            $ref: '#/components/schemas/ErrorId'
+        currentStep:
+          $ref: '#/components/schemas/VerificationStep'
+        segment:
+          $ref: '#/components/schemas/Segment'
+        subsegment:
+          $ref: '#/components/schemas/SubSegment'
+        systemErrorMessage:
+          type: string
+          description: A description of the error that occurred to use for debugging purposes, not meant to be shown to the end user
+      required:
+        - verificationId
+        - currentStep
+        - errorIds
+        - systemErrorMessage
+    EstimatedReviewTime:
+      type: string
+      description: An estimation for how long an end user can expect a review to take
+      enum:
+        - A_FEW_MINUTES
+        - A_FEW_HOURS
+        - A_FEW_DAYS
+    FirstResponder:
+      type: object
+      description: A first responder to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        birthDate:
+          $ref: '#/components/schemas/ValidBirthDate'
+        status:
+          deprecated: true
+          $ref: '#/components/schemas/FirstResponderStatus'
+        statuses:
+          type: array
+          description: List of first responder statuses.
+          items:
+            $ref: '#/components/schemas/FirstResponderStatus'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+        postalCode:
+          type: string
+          description: The postal code for the person being verified. Provide when open org is submitted, i.e. organization id = 0
+      required:
+        - firstName
+        - lastName
+        - email
+        - organization
+        - statuses
+    FirstResponderStatus:
+      type: string
+      enum:
+        - POLICE
+        - EMT
+        - FIREFIGHTER
+    InactiveMilitary:
+      type: object
+      description: An inactive military member to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        birthDate:
+          $ref: '#/components/schemas/ValidBirthDate'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        dischargeDate:
+          type: string
+          format: date
+          description: The date the person being verified was discharged from the military
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - birthDate
+        - organization
+        - dischargeDate
+    Internationalization:
+      type: object
+      properties:
+        locale:
+          type: string
+          description: The locale to use for internationalization
+        messages:
+          $ref: '#/components/schemas/ProgramMessages'
+      required:
+        - locale
+        - messages
+    IPAddress:
+      type: string
+      format: ipv4
+      description: >-
+        The end-user's public IP address. This only needs to be provided in situations where the HTTP requests do not
+        come directly from the end-user.
+    MarketConsent:
+      type: object
+      description: The current market consent configuration data for the program being used for a verification
+      properties:
+        enabled:
+          type: boolean
+          description: The value whether or not market consent is enabled
+        required:
+          type: boolean
+          description: The value that makes market consent to be mandatory or not
+        message:
+          type: string
+          description: The message to display in the verification
+      required:
+        - enabled
+        - required
+        - message
+    MarketplaceSubject:
+      type: object
+      description: A marketplace user to be verified
+      properties:
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - email
+    MedicalProfessional:
+      type: object
+      description: A medical professional to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        birthDate:
+          $ref: '#/components/schemas/ValidBirthDate'
+        postalCode:
+          type: string
+          description: The postal code for the person being verified
+        status:
+          deprecated: true
+          $ref: '#/components/schemas/MedicalProfessionalStatus'
+        statuses:
+          type: array
+          description: List of medical professional statuses. A single value will be interpreted as a list with one entry.
+          items:
+            $ref: '#/components/schemas/MedicalProfessionalStatus'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - birthDate
+        - postalCode
+        - organization
+        - statuses
+    MedicalProfessionalStatus:
+      type: string
+      enum:
+        - NURSE
+        - DOCTOR
+    MilitaryStatus:
+      type: string
+      enum:
+        - ACTIVE_DUTY
+        - VETERAN
+        - RESERVIST
+        - MILITARY_RETIREE
+        - MILITARY_FAMILY
+    MilitaryStatusRequest:
+      type: object
+      description: The military status for a military member being verified
+      properties:
+        status:
+          $ref: '#/components/schemas/MilitaryStatus'
+      required:
+        - status
+    NewEmploymentVerificationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NewVerificationResponse'
+      description: >-
+        A representation of a new verification that provides the segment being verified, a list of available statuses
+        for the program, and the URL to submit data to
+      properties:
+        availableStatuses:
+          type: array
+          description: The list of statuses that are available for selection by the program
+          items:
+            $ref: '#/components/schemas/EmploymentStatus'
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+        - availableStatuses
+    NewFirstResponderVerificationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NewVerificationResponse'
+      description: >-
+        A representation of a new verification that provides the segment being verified, a list of available statuses
+        for the program, and the URL to submit data to
+      properties:
+        availableStatuses:
+          type: array
+          description: The list of statuses that are available for selection by the program
+          items:
+            $ref: '#/components/schemas/FirstResponderStatus'
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+        - availableStatuses
+    NewMarketplaceVerificationRequest:
+      type: object
+      description: The program ID, tracking ID, and subject to track for a marketplace verification
+      properties:
+        programId:
+          type: string
+          description: The program ID to use for the verification
+        trackingId:
+          type: string
+          description: An program-scope unique ID specified by the consumer
+        subject:
+          $ref: '#/components/schemas/MarketplaceSubject'
+      required:
+        - programId
+        - trackingId
+        - subject
+    NewMarketplaceVerificationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NewVerificationResponse'
+      description: >-
+        A representation of a new verification that provides the segment being verified, a list of available statuses
+        for the program, and the URL to submit data to
+      properties:
+        verificationToken:
+          type: string
+          description: The verification token that can be used to verify the user
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+        - verificationToken
+    NewMedicalProfessionalVerificationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NewVerificationResponse'
+      description: >-
+        A representation of a new verification that provides the segment being verified, a list of available statuses
+        for the program, and the URL to submit data to
+      properties:
+        availableStatuses:
+          type: array
+          description: The list of statuses that are available for selection by the program
+          items:
+            $ref: '#/components/schemas/MedicalProfessionalStatus'
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+        - availableStatuses
+    NewMilitaryVerificationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NewVerificationResponse'
+      description: >-
+        A representation of a new verification that provides the segment being verified, a list of available statuses
+        for the program, and the URL to submit data to
+      properties:
+        availableStatuses:
+          type: array
+          description: The list of statuses that are available for selection by the program
+          items:
+            $ref: '#/components/schemas/MilitaryStatus'
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+        - availableStatuses
+    NewVerificationRequest:
+      type: object
+      description: The program ID to use for the verification
+      properties:
+        programId:
+          type: string
+          description: The program ID to use for the verification
+        trackingId:
+          type: string
+          description: An optional ID specified by the consumer to support conversion tracking
+      required:
+        - programId
+    NewVerificationResponse:
+      type: object
+      description: A representation of a new verification that provides the segment being verified and the URL to submit data to
+      properties:
+        verificationId:
+          type: string
+          description: The unique identifier for the ongoing verification
+        currentStep:
+          $ref: '#/components/schemas/VerificationStep'
+        submissionUrl:
+          type: string
+          description: The url to use for submitting person data
+        errorIds:
+          type: array
+          description: The list of errors that occurred, if any
+          items:
+            $ref: '#/components/schemas/ErrorId'
+        segment:
+          $ref: '#/components/schemas/Segment'
+        subsegment:
+          $ref: '#/components/schemas/SubSegment'
+      required:
+        - verificationId
+        - currentStep
+        - submissionUrl
+    Organization:
+      type: object
+      description: An organization that can be used for instant verification of various segments (Student, Teacher, Military, etc.)
+      properties:
+        name:
+          type: string
+          description: The name of the organization
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier for the organization
+      required:
+        - id
+        - name
+    OrganizationType:
+      type: string
+      enum:
+        - UNIVERSITY
+        - POST_SECONDARY
+        - MEMBERSHIP
+        - MILITARY
+        - FIRST_RESPONDER
+        - MEDICAL
+        - NON_PROFIT
+        - CORPORATE
+        - K12
+        - AGE_ID
+        - HIGH_SCHOOL
+        - NONE
+    PendingResponse:
+      type: object
+      description: The verification is undergoing an asynchronous process (e.g. document review). A polling URL is provided to get the current status.
+      properties:
+        verificationId:
+          type: string
+          description: >-
+            The unique ID for the
+            [VerificationRequest](#!/components/schemas/VerificationRequest) associated
+            with this response
+        statusUrl:
+          type: string
+          description: The url to poll to determine the result of the document review
+        currentStep:
+          $ref: '#/components/schemas/VerificationStep'
+        errorIds:
+          type: array
+          description: The list of errors that occurred, if any
+          items:
+            $ref: '#/components/schemas/ErrorId'
+        segment:
+          $ref: '#/components/schemas/Segment'
+        subsegment:
+          $ref: '#/components/schemas/SubSegment'
+      required:
+        - verificationId
+        - currentStep
+        - statusUrl
+    PersonalInfoMessages:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title for the collect personal information step
+        subtitle:
+          type: string
+          description: The subtitle for the collect personal information step
+      required:
+        - title
+        - subtitle
+    PersonalInfoMetadata:
+      type: object
+      additionalProperties:
+        type: string
+        maxLength: 10000
+      maxProperties: 20
+      description: A collection of custom metadata to be stored with the verification
+    ProgramConfig:
+      type: object
+      description: The current configuration data for a program.
+    ProgramMessages:
+      type: object
+      properties:
+        companyName:
+          type: string
+          description: The company name associated with the program. This is a dynamic value (changes per program)
+        step:
+          $ref: '#/components/schemas/StepMessages'
+      required:
+        - companyName
+        - step
+    ProgramTheme:
+      type: object
+      description: Any messaging or CSS that was configured in the self service tool for the program being used for verification
+      properties:
+        intl:
+          $ref: '#/components/schemas/Internationalization'
+        customCss:
+          type: string
+          description: Custom CSS to use when rendering the verification form
+        logoUrl:
+          type: string
+          description: URL of the logo associated with this program
+        isTestMode:
+          type: boolean
+          description: Whether or not the program is in test mode
+        openOrgSearchEnabled:
+          type: boolean
+          description: Flag indicating whether the end-user can supply an unknown org when attempting to verify.
+        smsNotifierConfigured:
+          type: boolean
+          description: Flag indicating whether this program has an SMS Notifier configured.
+        config:
+          $ref: '#/components/schemas/ProgramVerificationConfig'
+      required:
+        - intl
+        - customCss
+        - logoUrl
+        - isTestMode
+        - config
+    ProgramVerificationConfig:
+      type: object
+      description: The current configuration data for the program being used for a verification
+      properties:
+        countries:
+          type: array
+          description: The list of countries that have been enabled for this program
+          items:
+            type: string
+            description: A country that has been configured as acceptable for the program
+        locales:
+          type: array
+          description: The list of available locales that have been configured for this program
+          items:
+            type: string
+            description: A locale (e.g. 'en-US'
+        maxReviewTime:
+          $ref: '#/components/schemas/ReviewTime'
+        estimatedReviewTime:
+          $ref: '#/components/schemas/EstimatedReviewTime'
+        marketConsent:
+          $ref: '#/components/schemas/MarketConsent'
+        customMetadata:
+          $ref: '#/components/schemas/CustomMetadata'
+        customFaqLink:
+          type: string
+          description: Location for faq link
+        orgSearchUrl:
+          type: string
+          description: The URL to use for finding organizations for verification
+        orgTypes:
+          type: array
+          description: A list of eligible organization types for the program
+          items:
+            $ref: '#/components/schemas/OrganizationType'
+        excludedOrganizationIds:
+          type: array
+          description: A list of organization IDs that have been exluded from the program
+          items:
+            type: integer
+            format: int64
+      required:
+        - countries
+        - locales
+        - maxReviewTime
+        - estimatedReviewTime
+        - marketConsent
+        - customMetadata
+        - customFaqLink
+        - orgSearchUrl
+        - orgTypes
+        - excludedOrganizationIds
+    RejectionReason:
+      type: string
+      enum:
+        - DOCUMENT_UNREADABLE
+        - DOCUMENT_PASSWORD_PROTECTED
+        - DOCUMENT_LIKELY_FRAUD
+        - DOCUMENT_UNSUPPORTED
+        - DOCUMENT_HANDWRITTEN
+        - MISSING_INFORMATION
+        - MISSING_INFORMATION_PERSON_NAME
+        - MISSING_INFORMATION_ORGANIZATION_NAME
+        - DOCUMENT_EXPIRED
+        - DOCUMENT_OUTDATED
+        - MISMATCH_PERSON_NAME
+        - MISMATCH_ORGANIZATION
+        - MISMATCH_STATUS
+        - INELIGIBLE_ORGANIZATION
+        - MISSING_INFORMATION_UNIVERSITY_ENROLLMENT
+        - INELIGIBLE_PERSON_HIGH_SCHOOL_STUDENT
+        - MISSING_INFORMATION_AFFILIATION_US_ARMED_FORCES
+        - MISMATCH_COMPANY_NAME_OR_ADDRESS
+        - PAYSTUB_OUTDATED_LAST_30_DAYS
+        - MISSING_INFORMATION_BIRTHDATE
+        - MISMATCH_BIRTHDATE
+        - DOCUMENT_OUTDATED_FACULTY
+        - MISSING_OR_MISMATCH_JOB_TITLE
+        - OTHER_CONTACT_US
+    ReportStatus:
+      type: string
+      enum:
+        - PENDING
+        - COMPLETE
+        - ERROR
+        - DELETED
+    ReportStatusResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          $ref: '#/components/schemas/ReportStatus'
+        statusUrl:
+          type: string
+          format: uri
+        retrievalUrl:
+          type: string
+          format: uri
+        requester:
+          type: string
+        created:
+          type: string
+          format: date-time
+    ReverificationTaskRequest:
+      type: object
+      description: A request to re-verify a group of previous verification requests
+      properties:
+        programId:
+          type: string
+          description: The program ID to use for the verification
+        verificationIds:
+          type: array
+          items:
+            type: string
+          description: The set of verificationIds to re-verify
+      required:
+        - programId
+        - verificationIds
+    ReverificationTaskResponse:
+      type: object
+      description: The response object from the re-verification task request
+      properties:
+        batchId:
+          type: string
+          description: The ID used to track the re-verification task
+        statusUrl:
+          type: string
+          description: The URL to check the status of the re-verification task
+        reportUrl:
+          type: string
+          description: The URL to request a report for the re-verification results
+      required:
+        - batchId
+    ReverificationTaskStatusReport:
+      type: object
+      description: The re-verification task status report with details about the re-verification task
+      properties:
+        batchId:
+          type: string
+          description: The ID used to track the re-verification task
+        created:
+          type: string
+          format: date
+          description: The date the re-verification task was created
+        status:
+          type: string
+          description: The status of the re-verification task
+          enum:
+            - CREATED
+            - DATA_UPLOADED
+            - PROCESSING
+            - CANCELLED
+            - COMPLETE
+        totalRecords:
+          type: integer
+          format: int32
+          description: The total number of records requested for the re-verification task
+        recordsProcessed:
+          type: integer
+          format: int32
+          description: The total number of records processed for the re-verification task so far
+      required:
+        - batchId
+        - created
+        - status
+    ReviewTime:
+      type: string
+      description: The maximum amount of time a review can take
+      enum:
+        - 20_MIN
+        - 2_HRS
+        - 24_HRS
+        - 3_DAY
+    Segment:
+      type: string
+      description: The market segment being verified
+      enum:
+        - student
+        - teacher
+        - military
+        - senior
+        - firstResponder
+        - medical
+        - employment
+        - marketplace
+        - other
+    Senior:
+      type: object
+      description: A senior to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        birthDate:
+          $ref: '#/components/schemas/ValidBirthDate'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        postalCode:
+          type: string
+          description: The postal code for the person being verified
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - birthDate
+        - postalCode
+    SsoResponse:
+      type: object
+      description: The user can visit an SSO login portal at the provided login url.
+      properties:
+        verificationId:
+          type: string
+          description: >-
+            The unique ID for the
+            [VerificationRequest](#!/components/schemas/VerificationRequest) associated
+            with this response
+        loginUrl:
+          type: string
+          description: The url to send the user to in order to perform an SSO login to verify.
+        cancelUrl:
+          type: string
+          description: The url to send a DELETE request to in order to cancel an ongoing SSO login attempt.
+        currentStep:
+          $ref: '#/components/schemas/VerificationStep'
+        errorIds:
+          type: array
+          description: The list of errors that occurred, if any
+          items:
+            $ref: '#/components/schemas/ErrorId'
+        segment:
+          $ref: '#/components/schemas/Segment'
+        subsegment:
+          $ref: '#/components/schemas/SubSegment'
+      required:
+        - verificationId
+        - currentStep
+        - loginUrl
+        - cancelUrl
+    StepMessages:
+      type: object
+      properties:
+        personalInfo:
+          $ref: '#/components/schemas/PersonalInfoMessages'
+        docUpload:
+          $ref: '#/components/schemas/DocUploadMessages'
+        success:
+          $ref: '#/components/schemas/SuccessMessages'
+      required:
+        - personalInfo
+        - docUpload
+        - success
+    Student:
+      type: object
+      description: A student to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        birthDate:
+          $ref: '#/components/schemas/ValidBirthDate'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whether marketing consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - birthDate
+        - organization
+    SubSegment:
+      type: string
+      description: The subsegment being verified
+      enum:
+        - activeDuty
+        - veteran
+        - retiree
+        - reservist
+        - militaryFamily
+        - police
+        - firefighter
+        - emt
+        - employee
+    SuccessMessages:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title for the success step
+        subtitle:
+          type: string
+          description: The subtitle for the success step
+        redirectUrl:
+          type: string
+          description: A redirect URL to provide if it has been configured
+        redirectButtonText:
+          type: string
+          description: The text to show on the redirect button if a redirect URL was configured
+      required:
+        - title
+        - subtitle
+        - redirectUrl
+        - redirectButtonText
+    SuccessResponse:
+      type: object
+      description: A successful verification, providing the reward code to provide to the verified user
+      properties:
+        verificationId:
+          type: string
+          description: >-
+            The unique ID for the
+            [VerificationRequest](#!/components/schemas/VerificationRequest) associated
+            with this response
+        rewardCode:
+          type: string
+          description: The reward code to present to the verified user
+        currentStep:
+          $ref: '#/components/schemas/VerificationStep'
+        errorIds:
+          type: array
+          description: The list of errors that occurred, if any
+          items:
+            $ref: '#/components/schemas/ErrorId'
+        segment:
+          $ref: '#/components/schemas/Segment'
+        subsegment:
+          $ref: '#/components/schemas/SubSegment'
+      required:
+        - verificationId
+        - rewardCode
+        - currentStep
+    SystemErrorMessage:
+      type: object
+      description: An error that occurred when configuring a program
+      properties:
+        systemErrorMessage:
+          type: string
+          description: The error that occurred
+      required:
+        - systemErrorMessage
+    Teacher:
+      type: object
+      description: A teacher to be verified
+      properties:
+        firstName:
+          description: The first name of the person being verified
+          type: string
+        lastName:
+          description: The last name of the person being verified
+          type: string
+        deviceFingerprintHash:
+          description: The device fingerprint collected for the person being verified
+          type: string
+        email:
+          $ref: '#/components/schemas/ValidEmail'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        phoneNumber:
+          $ref: '#/components/schemas/ValidPhoneNumber'
+        postalCode:
+          type: string
+          description: The postal code for the person being verified. Provide when open org is submitted, i.e. organization id = 0
+        ipAddress:
+          $ref: '#/components/schemas/IPAddress'
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+        marketConsent:
+          description: Whenever the market consent is accepted
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - email
+        - organization
+    ValidBirthDate:
+      description: The date of birth of the person being verified (format YYYY-MM-DD). Date must be greater than `1900-01-01`.
+      type: string
+      format: date
+    ValidEmail:
+      description: The email address of the person being verified
+      type: string
+      pattern: '(^\s*?[A-Za-z0-9!#$%&''*+\/=?^_`{|}~-]+(\.[A-Za-z0-9!#$%&''*+\/=?^_`{|}~-]+)*@([A-Za-z0-9!#$%&''*+\/=?^_`{|}~-]+(\.[A-Za-z0-9!#$%&''*+\/=?^_`{|}~-]+)+|\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])\s*?$)'
+    ValidPhoneNumber:
+      description: The phone number used for SMS messages
+      type: string
+      pattern: '\+?0*\d{10,}(x[0-9]{0,5})?'
+    VerificationDetails:
+      type: object
+      description: Detailed information about a given verification. Must have a valid API token to view.
+      properties:
+        created:
+          type: string
+          format: date-time
+          description: The date the verification was created
+        updated:
+          type: string
+          format: date-time
+          description: The date the program was updated
+        programId:
+          type: string
+          description: The program ID that was used to create this verification
+        trackingId:
+          type: sting
+          description: The tracking ID that was assigned to this verification
+        lastResponse:
+          $ref: '#/components/schemas/VerificationResponse'
+        personInfo:
+          $ref: '#/components/schemas/VerificationSubject'
+        docUploadRejectionCount:
+          type: number
+          description: The number of times this verification had rejected document reviews
+        metadata:
+          $ref: '#/components/schemas/PersonalInfoMetadata'
+      required:
+        - created
+        - updated
+        - programId
+        - lastResponse
+        - personInfo
+        - docUploadRejectionCount
+        - metadata
+    VerificationLimitRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: The number of verifications to allow in a given time period
+        days:
+          type: integer
+          description: The number of days the verification limit should be enacted
+      required:
+        - quantity
+        - days
+    VerificationReportRequest:
+      type: object
+      properties:
+        format:
+          type: string
+          enum:
+            - CSV
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+      required:
+        - format
+    VerificationResponse:
+      type: object
+      description: The result of a verification step
+      oneOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - $ref: '#/components/schemas/NewVerificationResponse'
+        - $ref: '#/components/schemas/NewMilitaryVerificationResponse'
+        - $ref: '#/components/schemas/NewFirstResponderVerificationResponse'
+        - $ref: '#/components/schemas/NewMedicalProfessionalVerificationResponse'
+        - $ref: '#/components/schemas/NewEmploymentVerificationResponse'
+        - $ref: '#/components/schemas/NewMarketplaceVerificationResponse'
+        - $ref: '#/components/schemas/DocumentReviewResponse'
+        - $ref: '#/components/schemas/PendingResponse'
+        - $ref: '#/components/schemas/ErrorResponse'
+        - $ref: '#/components/schemas/SsoResponse'
+    VerificationStep:
+      type: string
+      enum:
+        - collectStudentPersonalInfo
+        - collectActiveMilitaryPersonalInfo
+        - collectInactiveMilitaryPersonalInfo
+        - collectTeacherPersonalInfo
+        - collectSeniorPersonalInfo
+        - collectFirstResponderPersonalInfo
+        - collectMedicalProfessionalPersonalInfo
+        - collectEmployeePersonalInfo
+        - collectMilitaryStatus
+        - collectMarketplaceToken
+        - docUpload
+        - sso
+        - success
+        - error
+        - pending
+    VerificationSubject:
+      type: object
+      description: A subject being verified
+      oneOf:
+        - $ref: '#/components/schemas/Student'
+        - $ref: '#/components/schemas/Teacher'
+        - $ref: '#/components/schemas/ActiveMilitary'
+        - $ref: '#/components/schemas/InactiveMilitary'
+        - $ref: '#/components/schemas/Senior'
+        - $ref: '#/components/schemas/FirstResponder'
+        - $ref: '#/components/schemas/MedicalProfessional'
+        - $ref: '#/components/schemas/Employee'
+        - $ref: '#/components/schemas/MarketplaceSubject'
+        - $ref: '#/components/schemas/VerificationToken'
+    VerificationToken:
+      type: object
+      description: A verification token used to complete a marketplace verification
+      properties:
+        verificationToken:
+          description: The verification token that can be used to verify the user
+          type: string
+      required:
+        - verificationToken
+    WebhookRequest:
+      type: object
+      properties:
+        callbackUri:
+          type: string
+          description: The URI to POST to on verification events
+      required:
+        - callbackUri
+  examples:
+    activeMilitarySuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: military
+        subSegment: activeDuty
+    activeMilitaryVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: military
+        subSegment: activeDuty
+    collectActiveMilitaryInfo:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectActiveMilitaryPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectActiveMilitaryPersonalInfo
+        errorIds: []
+        segment: military
+        subSegment: activeDuty
+    collectActiveMilitaryInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectActiveMilitaryPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectActiveMilitaryPersonalInfo
+        errorIds: [ 'invalidBirthDate' ]
+        segment: military
+        subSegment: activeDuty
+    collectEmployeeInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectEmployeePersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectEmployeePersonalInfo
+        errorIds: [ 'invalidEmail' ]
+        segment: employment
+        subSegment: employee
+    collectFirstResponderInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectFirstResponderPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectFirstResponderPersonalInfo
+        errorIds: [ 'invalidEmail' ]
+        availableStatuses: [ 'POLICE', 'EMT', 'FIREFIGHTER' ]
+        segment: firstResponder
+        subSegment: police
+    collectInactiveMilitaryInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectInactiveMilitaryPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectInactiveMilitaryPersonalInfo
+        errorIds: [ 'invalidBirthDate' ]
+        segment: military
+        subSegment: veteran
+    collectMarketplaceToken:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectMarketplaceToken
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectMarketplaceToken
+        errorIds: []
+        segment: marketplace
+        subSegment: null
+        verificationToken: 'AbcdEfg1234!@#$AbcdEfg1234!@#$12'
+    collectMedicalProfessionalInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectMedicalProfessionalPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectMedicalProfessionalPersonalInfo
+        errorIds: [ 'invalidEmail' ]
+        availableStatuses: [ 'NURSE', 'DOCTOR' ]
+        segment: medical
+        subSegment: nurse
+    collectMilitaryStatusInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectActiveMilitaryPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectMilitaryStatus
+        availableStatuses: [ 'ACTIVE_DUTY', 'VETERAN', 'MILITARY_RETIREE' ]
+        errorIds: [ 'invalidMilitaryStatus' ]
+        segment: military
+        subSegment: null
+    collectSeniorInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectSeniorPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectSeniorPersonalInfo
+        errorIds: [ 'invalidEmail' ]
+        segment: senior
+        subSegment: null
+    collectStudentInfo:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectStudentPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectStudentPersonalInfo
+        errorIds: []
+        segment: student
+        subSegment: null
+    collectStudentInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectStudentPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectStudentPersonalInfo
+        errorIds: [ 'invalidBirthDate' ]
+        segment: student
+        subSegment: null
+    collectTeacherInfoInvalid:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: collectTeacherPersonalInfo
+        submissionUrl: /rest/v2/verification/111111111111111111111111/collectTeacherPersonalInfo
+        errorIds: [ 'invalidPostalCode' ]
+        segment: teacher
+        subSegment: null
+    docReviewLimitExceededError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'docReviewLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of document reviews
+        segment: student
+        subSegment: null
+    docUpload:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: docUpload
+        rejectionReasons: [ 'DOCUMENT_EXPIRED' ]
+        submissionUrl: /rest/v2/verification/111111111111111111111111/docUpload/123456789
+        errorIds: []
+        segment: student
+        subSegment: null
+    employeeSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: employment
+        subSegment: employee
+    employeeVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: employment
+        subSegment: employee
+    firstResponderSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: firstResponder
+        subSegment: police
+    firstResponderVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: firstResponder
+        subSegment: police
+    inactiveMilitarySuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: military
+        subSegment: veteran
+    inactiveMilitaryVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: military
+        subSegment: veteran
+    invalidProgramError:
+      value:
+        verificationId: null
+        currentStep: error
+        errorIds: [ 'invalidProgram' ]
+        systemErrorMessage: Program with id '222222222222222222222222' is not setup to perform this step
+        segment: null
+        subSegment: null
+    invalidSsoError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'invalidStep' ]
+        systemErrorMessage: Verification with id '111111111111111111111111' does not have an ongoing SSO request
+        segment: student
+        subSegment: null
+    invalidTokenError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'invalidApiToken' ]
+        systemErrorMessage: Provided API token is empty or invalid
+        segment: null
+        subSegment: null
+    marketplaceSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: marketplace
+        subSegment: null
+    marketplaceVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: marketplace
+        subSegment: null
+    maxFilesExceededError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'invalidNumberOfFiles' ]
+        systemErrorMessage: Maximum number of files has been exceeded
+        segment: student
+        subSegment: null
+    medicalProfessionalSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: medical
+        subSegment: nurse
+    medicalProfessionalVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: medical
+        subSegment: nurse
+    pending:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: pending
+        statusUrl: /rest/v2/verification/111111111111111111111111
+        errorIds: []
+        segment: student
+        subSegment: null
+    programNotFoundError:
+      value:
+        verificationId: null
+        currentStep: error
+        errorIds: [ 'noProgram' ]
+        systemErrorMessage: Program with ID '222222222222222222222222' not found
+        segment: null
+        subSegment: null
+    reportStatusResponseComplete:
+      value:
+        id: '111111111111111111111111'
+        status: 'COMPLETE'
+        statusUrl: 'https://services.sheerid.com/rest/v2/report/verification/111111111111111111111111/status'
+        retrievalUrl: 'https://services.sheerid.com/rest/v2/report/verification/111111111111111111111111'
+        requester: "222222222222222222222222"
+        created: 1234567891234
+    reportStatusResponsePending:
+      value:
+        id: '111111111111111111111111'
+        status: 'PENDING'
+        statusUrl: 'https://services.sheerid.com/rest/v2/report/verification/111111111111111111111111/status'
+        retrievalUrl: null
+        requester: "222222222222222222222222"
+        created: 1234567891234
+    seniorSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: senior
+        subSegment: null
+    seniorVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: senior
+        subSegment: null
+    studentSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: student
+        subSegment: null
+    studentVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: student
+        subSegment: null
+    teacherSuccess:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: success
+        rewardCode: MY_CODE
+        errorIds: []
+        segment: teacher
+        subSegment: null
+    teacherVerificationLimitError:
+      value:
+        verificationId: '111111111111111111111111'
+        currentStep: error
+        errorIds: [ 'verificationLimitExceeded' ]
+        systemErrorMessage: User has exceeded the maximum number of verifications
+        segment: teacher
+        subSegment: null
+    verificationDetails:
+      value:
+        programId: '222222222222222222222222'
+        trackingId: '333333333333333333333333'
+        created: 1553622624552
+        updated: 1553622624552
+        lastResponse:
+          verificationId: '111111111111111111111111'
+          currentStep: success
+          rewardCode: MY_CODE
+          errorIds: []
+          segment: student
+          subSegment: null
+        personInfo:
+          firstName: Joe
+          lastName: Verify
+          email: joe.verify@sheerid.com
+          birthDate: '1991-01-01'
+          metadata:
+            my: stuff
+          organization:
+            id: 1234
+            name: Some Organization
+        docUploadRejectionCount: 1
+    verificationNotFoundError:
+      value:
+        verificationId: null
+        currentStep: error
+        errorIds: [ 'noVerification' ]
+        systemErrorMessage: Verification with ID '111111111111111111111111' not found
+        segment: null
+        subSegment: null
