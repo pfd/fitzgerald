@@ -28,7 +28,6 @@ info:
     Content-Type: application/json
     Authorization: Bearer {YOUR_ACCESS_TOKEN}
     ```
-  description: REST API to support performing verifications
   version: 2.0.0
   title: SheerID API
   contact:
