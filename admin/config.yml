@@ -16,17 +16,12 @@ public_folder: "/assets/images" # The src attribute for uploaded media will begi
 collections:
   - label: "Cool Docs"
     name: "docs"
-    folder: "docs"
+    folder: "docs/"
     create: true
-    filter: {field: "language", value: "en"}
+    nested:
+      depth: 20
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Content", name: "body", widget: "markdown"}
       - {label: "Nav Order", name: "nav_order", widget: "string"}
-
-defaults:
-  - scope:
-      path: ""
-      type: "docs"
-    values:
-      layout: default
+      - {label: 'Layout', name: 'layout', widget: 'hidden', default: 'default' }
