@@ -16,9 +16,11 @@ public_folder: "/assets/images" # The src attribute for uploaded media will begi
 collections:
   - name: "docs"
     label: "Docs"
-    folder: "docs"
-    filter:
-      field: language
-      value: en
-    fields:
-      - {label: "Language", name: "language"}
+    type: "docs"
+
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
