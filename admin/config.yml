@@ -7,7 +7,7 @@ publish_mode: editorial_workflow
 
 # This line should *not* be indented
 media_folder: "assets/images" # Media files will be stored in the repo under images/uploads
-If you're creating a new folder for uploaded media, you'll need to know
+# If you're creating a new folder for uploaded media, you'll need to know
 
 # These lines should *not* be indented
 public_folder: "/assets/images" # The src attribute for uploaded media will begin with /images/uploads
